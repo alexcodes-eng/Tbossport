@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Inter-House Sports Live Scores</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="refresh" content="20">
+
+<style>
+body{font-family:Arial;background:#f4f6f9;margin:0;padding:15px;font-size:18px;}
+h1{text-align:center;font-size:34px;}
+
+.red{color:#b30000;font-weight:bold;}
+.blue{color:#0047ab;font-weight:bold;}
+.green{color:#006400;font-weight:bold;}
+.yellow{color:#b59b00;font-weight:bold;}
+.white{color:#555;font-weight:bold;}
+.orange{color:#e65100;font-weight:bold;}
+
+.card{background:#fff;padding:15px;margin-bottom:25px;border-radius:10px;box-shadow:0 3px 8px rgba(0,0,0,0.1);}
+.status{padding:6px 14px;border-radius:20px;font-size:14px;display:inline-block;margin-bottom:10px;}
+.upcoming{background:#eee;}
+.ongoing{background:#e6f4ff;color:#0056b3;}
+.finished{background:#e7f6ea;color:#1e7e34;}
+
+table{width:100%;border-collapse:collapse;margin-top:10px;}
+th,td{padding:12px;text-align:center;border-bottom:1px solid #ddd;}
+th{background:#f0f0f0;}
+
+.position-1{background:#ffd700;}
+.position-2{background:#c0c0c0;}
+.position-3{background:#cd7f32;}
+
+@media(max-width:600px){
+h1{font-size:26px;}
+body{font-size:16px;}
+}
+</style>
+</head>
+
+<body>
+
+<h1>🏆 Inter-House Sports Live Results</h1>
+
+<div class="card">
+<h2>Overall House Ranking</h2>
+<table id="summary">
+<tr>
+<th>Position</th>
+<th>House</th>
+<th>Points</th>
+<th>🥇</th>
+<th>🥈</th>
+<th>🥉</th>
+</tr>
+</table>
+</div>
+
+<!-- ================= EVENTS ================= -->
+
+<!-- TEMPLATE EVENTS (EDIT POINTS ONLY) -->
+<div class="card event" data-points='{"red":3,"blue":3,"green":6,"yellow":0,"white":0,"orange":2}'>
+  
+  <!-- Chess -->
+<h2>CHESS</h2>
+<span class="status ongoing">Ongoing</span>
+<table></table>
+</div>
+
+<div class="card event" data-points='{"green":3,"yellow":0,"red":3,"blue":3,"orange":6,"white":3}'>
+  
+     <!-- Ayo -->
+<h2>AYO</h2>
+<span class="status ongoing">Ongoing</span>
+<table></table>
+</div>
+
+<div class="card event" data-points='{"blue":0,"red":0,"green":0,"yellow":0,"white":0,"orange":0}'>
+  
+  
+   <!-- Ludo -->
+<h2>LUDO</h2>
+<span class="status ongoing">Ongoing</span>
+<table></table>
+</div>
+
+<div class="card event" data-points='{"yellow":0,"green":0,"blue":0,"red":0,"white":0,"orange":0}'>
+  
+  
+   <!-- Scrabble -->
+<h2>SCRABBLE</h2>
+<span class="status upcoming">Upcoming</span>
+<table></table>
+</div>
+
+<div class="card event" data-points='{"green":0,"red":0,"blue":0,"yellow":0,"orange":0,"white":0}'>
+  
+  
+   <!-- 100m Race -->
+<h2>100m Race (Male - Primary)</h2>
+<span class="status upcoming">Upcoming</span>
+<table></table>
+</div>
+
+<div class="card event" data-points='{"red":0,"blue":0,"green":0,"yellow":0,"white":0,"orange":0}'>
+  
+  
+     <!-- 100m Race female-->
+<h2>100m Race (Female - Primary)</h2>
+<span class="status upcoming">Upcoming</span>
+<table></table>
+</div>
+
+<div class="card event" data-points='{"green":0,"blue":0,"red":0,"yellow":0,"white":0,"orange":0}'>
+  
+  
+<h2>Football</h2>
+<span class="status upcoming">Upcoming</span>
+<table></table>
+</div>
+
+<div class="card event" data-points='{"yellow":0,"green":0,"blue":0,"red":0,"orange":0,"white":0}'>
+<h2>Relay Race (Senior)</h2>
+<span class="status upcoming">Upcoming</span>
+<table></table>
+</div>
+
+<!-- 👉 You can continue adding ALL your events like this -->
+
+<!-- ================= SCRIPT ================= -->
+
+<script>
+
+const houses={
+red:{name:"Red House",points:0,gold:0,silver:0,bronze:0},
+blue:{name:"Blue House",points:0,gold:0,silver:0,bronze:0},
+green:{name:"Green House",points:0,gold:0,silver:0,bronze:0},
+yellow:{name:"Yellow House",points:0,gold:0,silver:0,bronze:0},
+white:{name:"White House",points:0,gold:0,silver:0,bronze:0},
+orange:{name:"Orange House",points:0,gold:0,silver:0,bronze:0}
+};
+
+document.querySelectorAll(".event").forEach(event=>{
+
+const scores=JSON.parse(event.dataset.points);
+
+// Convert to array & sort
+let sorted=Object.entries(scores)
+.sort((a,b)=>b[1]-a[1]);
+
+let table=event.querySelector("table");
+table.innerHTML="<tr><th>Position</th><th>House</th><th>Score</th></tr>";
+
+sorted.forEach((item,index)=>{
+let house=item[0];
+let score=item[1];
+
+// Assign position points
+let pts=6-index;
+
+// Update totals
+houses[house].points+=pts;
+if(index===0) houses[house].gold++;
+if(index===1) houses[house].silver++;
+if(index===2) houses[house].bronze++;
+
+// Row styling
+let cls="";
+if(index===0) cls="position-1";
+if(index===1) cls="position-2";
+if(index===2) cls="position-3";
+
+table.innerHTML+=`
+<tr class="${cls}">
+<td>${index+1}</td>
+<td class="${house}">${houses[house].name}</td>
+<td>${score}</td>
+</tr>`;
+});
+
+});
+
+// Final ranking
+const final=Object.entries(houses)
+.sort((a,b)=>b[1].points-a[1].points);
+
+const summary=document.getElementById("summary");
+
+final.forEach((h,i)=>{
+summary.innerHTML+=`
+<tr>
+<td>${i+1}</td>
+<td class="${h[0]}">${h[1].name}</td>
+<td>${h[1].points}</td>
+<td>${h[1].gold}</td>
+<td>${h[1].silver}</td>
+<td>${h[1].bronze}</td>
+</tr>`;
+});
+
+</script>
+
+</body>
+</html>
