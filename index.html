@@ -59,7 +59,7 @@ body{font-size:16px;}
 <!-- ================= EVENTS ================= -->
 
 <!-- TEMPLATE EVENTS (EDIT POINTS ONLY) -->
-<div class="card event" data-points='{"red":3,"blue":3,"green":6,"yellow":0,"white":0,"orange":2}'>
+<div class="card event" data-points='{"red":6,"blue":3,"green":6,"yellow":0,"white":0,"orange":5}'>
   
   <!-- Chess -->
 <h2>CHESS</h2>
@@ -67,11 +67,13 @@ body{font-size:16px;}
 <table></table>
 </div>
 
-<div class="card event" data-points='{"green":3,"yellow":0,"red":3,"blue":3,"orange":6,"white":3}'>
+<div class="event" 
+data-points='{"green":9,"red":7,"white":3,"blue":3,"orange":17,"yellow":0}'
+data-rank='["orange","green","red","white","blue","yellow"]'>
   
      <!-- Ayo -->
 <h2>AYO</h2>
-<span class="status ongoing">Ongoing</span>
+<span class="status finished">Finished</span>
 <table></table>
 </div>
 
@@ -131,34 +133,57 @@ body{font-size:16px;}
 
 <script>
 
+
 const houses={
-red:{name:"Red House",points:0},
-blue:{name:"Blue House",points:0},
-green:{name:"Green House",points:0},
-yellow:{name:"Yellow House",points:0},
-white:{name:"White House",points:0},
-orange:{name:"Orange House",points:0}
+red:{name:"Red House",points:0,gold:0,silver:0,bronze:0},
+blue:{name:"Blue House",points:0,gold:0,silver:0,bronze:0},
+green:{name:"Green House",points:0,gold:0,silver:0,bronze:0},
+yellow:{name:"Yellow House",points:0,gold:0,silver:0,bronze:0},
+white:{name:"White House",points:0,gold:0,silver:0,bronze:0},
+orange:{name:"Orange House",points:0,gold:0,silver:0,bronze:0}
 };
 
 document.querySelectorAll(".event").forEach(event=>{
 
-const scores=JSON.parse(event.dataset.points);
+let scores = JSON.parse(event.dataset.points);
+let status = event.querySelector(".status").classList;
 
-// Sort based on score
-let sorted=Object.entries(scores)
-.sort((a,b)=>b[1]-a[1]);
+// check if finished
+let isFinished = status.contains("finished");
 
-let table=event.querySelector("table");
-table.innerHTML="<tr><th>Position</th><th>House</th><th>Points</th></tr>";
+// manual ranking (if any)
+let rankOverride = event.dataset.rank 
+  ? JSON.parse(event.dataset.rank) 
+  : null;
+
+let sorted=[];
+
+// ✅ use manual ranking if exists
+if(rankOverride){
+    sorted = rankOverride.map(h => [h, scores[h]]);
+}else{
+    sorted = Object.entries(scores)
+    .sort((a,b)=>b[1]-a[1]);
+}
+
+let table = event.querySelector("table");
+table.innerHTML="<tr><th>Position</th><th>House</th><th>Score</th></tr>";
 
 sorted.forEach((item,index)=>{
 let house=item[0];
 let score=item[1];
 
-// ✅ ADD DIRECT POINTS (NEW SYSTEM)
+// ✅ ADD REAL SCORE TO LEADERBOARD
 houses[house].points += score;
 
-// Row styling
+// ✅ GIVE MEDALS ONLY IF FINISHED
+if(isFinished){
+    if(index===0) houses[house].gold++;
+    if(index===1) houses[house].silver++;
+    if(index===2) houses[house].bronze++;
+}
+
+// styling
 let cls="";
 if(index===0) cls="position-1";
 if(index===1) cls="position-2";
@@ -174,11 +199,24 @@ table.innerHTML+=`
 
 });
 
-// Final ranking
+// ================= FINAL LEADERBOARD =================
+
 const final=Object.entries(houses)
 .sort((a,b)=>b[1].points-a[1].points);
 
 const summary=document.getElementById("summary");
+
+// reset table
+summary.innerHTML=`
+<tr>
+<th>Position</th>
+<th>House</th>
+<th>Total Points</th>
+<th>🥇</th>
+<th>🥈</th>
+<th>🥉</th>
+</tr>
+`;
 
 final.forEach((h,i)=>{
 summary.innerHTML+=`
@@ -186,9 +224,9 @@ summary.innerHTML+=`
 <td>${i+1}</td>
 <td class="${h[0]}">${h[1].name}</td>
 <td>${h[1].points}</td>
-<td>-</td>
-<td>-</td>
-<td>-</td>
+<td>${h[1].gold}</td>
+<td>${h[1].silver}</td>
+<td>${h[1].bronze}</td>
 </tr>`;
 });
 
